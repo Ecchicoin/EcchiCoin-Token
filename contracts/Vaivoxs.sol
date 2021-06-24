@@ -1,16 +1,19 @@
-// File: openzeppelin-solidity\contracts\token\ERC20\IERC20.sol
-
-// SPDX-License-Identifier: MIT
-
-pragma solidity ^0.8.0;
+/**
+ *Submitted for verification at BscScan.com on 2021-06-09
+*/
 
 /**
- * @dev Interface of the ERC20 standard as defined in the EIP.
- */
+ *Submitted for verification at BscScan.com on 2021-06-06
+ *vaivo.com - Jordan Carvalho / Gabriel Passos
+*/
+
+pragma solidity ^0.8.4;
+
+
+// SPDX-License-Identifier: Unlicensed
+
 interface IERC20 {
-    /**
-     * @dev Returns the amount of tokens in existence.
-     */
+
     function totalSupply() external view returns (uint256);
 
     /**
@@ -78,302 +81,21 @@ interface IERC20 {
     event Approval(address indexed owner, address indexed spender, uint256 value);
 }
 
-// File: openzeppelin-solidity\contracts\utils\Address.sol
 
-
-
-pragma solidity ^0.8.0;
 
 /**
- * @dev Collection of functions related to the address type
- */
-library Address {
-    /**
-     * @dev Returns true if `account` is a contract.
-     *
-     * [IMPORTANT]
-     * ====
-     * It is unsafe to assume that an address for which this function returns
-     * false is an externally-owned account (EOA) and not a contract.
-     *
-     * Among others, `isContract` will return false for the following
-     * types of addresses:
-     *
-     *  - an externally-owned account
-     *  - a contract in construction
-     *  - an address where a contract will be created
-     *  - an address where a contract lived, but was destroyed
-     * ====
-     */
-    function isContract(address account) internal view returns (bool) {
-        // This method relies on extcodesize, which returns 0 for contracts in
-        // construction, since the code is only stored at the end of the
-        // constructor execution.
-
-        uint256 size;
-        // solhint-disable-next-line no-inline-assembly
-        assembly { size := extcodesize(account) }
-        return size > 0;
-    }
-
-    /**
-     * @dev Replacement for Solidity's `transfer`: sends `amount` wei to
-     * `recipient`, forwarding all available gas and reverting on errors.
-     *
-     * https://eips.ethereum.org/EIPS/eip-1884[EIP1884] increases the gas cost
-     * of certain opcodes, possibly making contracts go over the 2300 gas limit
-     * imposed by `transfer`, making them unable to receive funds via
-     * `transfer`. {sendValue} removes this limitation.
-     *
-     * https://diligence.consensys.net/posts/2019/09/stop-using-soliditys-transfer-now/[Learn more].
-     *
-     * IMPORTANT: because control is transferred to `recipient`, care must be
-     * taken to not create reentrancy vulnerabilities. Consider using
-     * {ReentrancyGuard} or the
-     * https://solidity.readthedocs.io/en/v0.5.11/security-considerations.html#use-the-checks-effects-interactions-pattern[checks-effects-interactions pattern].
-     */
-    function sendValue(address payable recipient, uint256 amount) internal {
-        require(address(this).balance >= amount, "Address: insufficient balance");
-
-        // solhint-disable-next-line avoid-low-level-calls, avoid-call-value
-        (bool success, ) = recipient.call{ value: amount }("");
-        require(success, "Address: unable to send value, recipient may have reverted");
-    }
-
-    /**
-     * @dev Performs a Solidity function call using a low level `call`. A
-     * plain`call` is an unsafe replacement for a function call: use this
-     * function instead.
-     *
-     * If `target` reverts with a revert reason, it is bubbled up by this
-     * function (like regular Solidity function calls).
-     *
-     * Returns the raw returned data. To convert to the expected return value,
-     * use https://solidity.readthedocs.io/en/latest/units-and-global-variables.html?highlight=abi.decode#abi-encoding-and-decoding-functions[`abi.decode`].
-     *
-     * Requirements:
-     *
-     * - `target` must be a contract.
-     * - calling `target` with `data` must not revert.
-     *
-     * _Available since v3.1._
-     */
-    function functionCall(address target, bytes memory data) internal returns (bytes memory) {
-      return functionCall(target, data, "Address: low-level call failed");
-    }
-
-    /**
-     * @dev Same as {xref-Address-functionCall-address-bytes-}[`functionCall`], but with
-     * `errorMessage` as a fallback revert reason when `target` reverts.
-     *
-     * _Available since v3.1._
-     */
-    function functionCall(address target, bytes memory data, string memory errorMessage) internal returns (bytes memory) {
-        return functionCallWithValue(target, data, 0, errorMessage);
-    }
-
-    /**
-     * @dev Same as {xref-Address-functionCall-address-bytes-}[`functionCall`],
-     * but also transferring `value` wei to `target`.
-     *
-     * Requirements:
-     *
-     * - the calling contract must have an ETH balance of at least `value`.
-     * - the called Solidity function must be `payable`.
-     *
-     * _Available since v3.1._
-     */
-    function functionCallWithValue(address target, bytes memory data, uint256 value) internal returns (bytes memory) {
-        return functionCallWithValue(target, data, value, "Address: low-level call with value failed");
-    }
-
-    /**
-     * @dev Same as {xref-Address-functionCallWithValue-address-bytes-uint256-}[`functionCallWithValue`], but
-     * with `errorMessage` as a fallback revert reason when `target` reverts.
-     *
-     * _Available since v3.1._
-     */
-    function functionCallWithValue(address target, bytes memory data, uint256 value, string memory errorMessage) internal returns (bytes memory) {
-        require(address(this).balance >= value, "Address: insufficient balance for call");
-        require(isContract(target), "Address: call to non-contract");
-
-        // solhint-disable-next-line avoid-low-level-calls
-        (bool success, bytes memory returndata) = target.call{ value: value }(data);
-        return _verifyCallResult(success, returndata, errorMessage);
-    }
-
-    /**
-     * @dev Same as {xref-Address-functionCall-address-bytes-}[`functionCall`],
-     * but performing a static call.
-     *
-     * _Available since v3.3._
-     */
-    function functionStaticCall(address target, bytes memory data) internal view returns (bytes memory) {
-        return functionStaticCall(target, data, "Address: low-level static call failed");
-    }
-
-    /**
-     * @dev Same as {xref-Address-functionCall-address-bytes-string-}[`functionCall`],
-     * but performing a static call.
-     *
-     * _Available since v3.3._
-     */
-    function functionStaticCall(address target, bytes memory data, string memory errorMessage) internal view returns (bytes memory) {
-        require(isContract(target), "Address: static call to non-contract");
-
-        // solhint-disable-next-line avoid-low-level-calls
-        (bool success, bytes memory returndata) = target.staticcall(data);
-        return _verifyCallResult(success, returndata, errorMessage);
-    }
-
-    /**
-     * @dev Same as {xref-Address-functionCall-address-bytes-}[`functionCall`],
-     * but performing a delegate call.
-     *
-     * _Available since v3.4._
-     */
-    function functionDelegateCall(address target, bytes memory data) internal returns (bytes memory) {
-        return functionDelegateCall(target, data, "Address: low-level delegate call failed");
-    }
-
-    /**
-     * @dev Same as {xref-Address-functionCall-address-bytes-string-}[`functionCall`],
-     * but performing a delegate call.
-     *
-     * _Available since v3.4._
-     */
-    function functionDelegateCall(address target, bytes memory data, string memory errorMessage) internal returns (bytes memory) {
-        require(isContract(target), "Address: delegate call to non-contract");
-
-        // solhint-disable-next-line avoid-low-level-calls
-        (bool success, bytes memory returndata) = target.delegatecall(data);
-        return _verifyCallResult(success, returndata, errorMessage);
-    }
-
-    function _verifyCallResult(bool success, bytes memory returndata, string memory errorMessage) private pure returns(bytes memory) {
-        if (success) {
-            return returndata;
-        } else {
-            // Look for revert reason and bubble it up if present
-            if (returndata.length > 0) {
-                // The easiest way to bubble the revert reason is using memory via assembly
-
-                // solhint-disable-next-line no-inline-assembly
-                assembly {
-                    let returndata_size := mload(returndata)
-                    revert(add(32, returndata), returndata_size)
-                }
-            } else {
-                revert(errorMessage);
-            }
-        }
-    }
-}
-
-// File: node_modules\openzeppelin-solidity\contracts\utils\Context.sol
-
-
-
-pragma solidity ^0.8.0;
-
-/*
- * @dev Provides information about the current execution context, including the
- * sender of the transaction and its data. While these are generally available
- * via msg.sender and msg.data, they should not be accessed in such a direct
- * manner, since when dealing with meta-transactions the account sending and
- * paying for execution may not be the actual sender (as far as an application
- * is concerned).
+ * @dev Wrappers over Solidity's arithmetic operations with added overflow
+ * checks.
  *
- * This contract is only required for intermediate, library-like contracts.
- */
-abstract contract Context {
-    function _msgSender() internal view virtual returns (address) {
-        return msg.sender;
-    }
-
-    function _msgData() internal view virtual returns (bytes calldata) {
-        this; // silence state mutability warning without generating bytecode - see https://github.com/ethereum/solidity/issues/2691
-        return msg.data;
-    }
-}
-
-// File: openzeppelin-solidity\contracts\access\Ownable.sol
-
-
-
-pragma solidity ^0.8.0;
-
-/**
- * @dev Contract module which provides a basic access control mechanism, where
- * there is an account (an owner) that can be granted exclusive access to
- * specific functions.
+ * Arithmetic operations in Solidity wrap on overflow. This can easily result
+ * in bugs, because programmers usually assume that an overflow raises an
+ * error, which is the standard behavior in high level programming languages.
+ * `SafeMath` restores this intuition by reverting the transaction when an
+ * operation overflows.
  *
- * By default, the owner account will be the one that deploys the contract. This
- * can later be changed with {transferOwnership}.
- *
- * This module is used through inheritance. It will make available the modifier
- * `onlyOwner`, which can be applied to your functions to restrict their use to
- * the owner.
+ * Using this library instead of the unchecked operations eliminates an entire
+ * class of bugs, so it's recommended to use it always.
  */
-abstract contract Ownable is Context {
-    address private _owner;
-
-    event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
-
-    /**
-     * @dev Initializes the contract setting the deployer as the initial owner.
-     */
-    constructor () {
-        address msgSender = _msgSender();
-        _owner = msgSender;
-        emit OwnershipTransferred(address(0), msgSender);
-    }
-
-    /**
-     * @dev Returns the address of the current owner.
-     */
-    function owner() public view virtual returns (address) {
-        return _owner;
-    }
-
-    /**
-     * @dev Throws if called by any account other than the owner.
-     */
-    modifier onlyOwner() {
-        require(owner() == _msgSender(), "Ownable: caller is not the owner");
-        _;
-    }
-
-    /**
-     * @dev Leaves the contract without owner. It will not be possible to call
-     * `onlyOwner` functions anymore. Can only be called by the current owner.
-     *
-     * NOTE: Renouncing ownership will leave the contract without an owner,
-     * thereby removing any functionality that is only available to the owner.
-     */
-    function renounceOwnership() public virtual onlyOwner {
-        emit OwnershipTransferred(_owner, address(0));
-        _owner = address(0);
-    }
-
-    /**
-     * @dev Transfers ownership of the contract to a new account (`newOwner`).
-     * Can only be called by the current owner.
-     */
-    function transferOwnership(address newOwner) public virtual onlyOwner {
-        require(newOwner != address(0), "Ownable: new owner is the zero address");
-        emit OwnershipTransferred(_owner, newOwner);
-        _owner = newOwner;
-    }
-}
-
-// File: contracts\EcchiCoin.sol
-
-
-pragma solidity ^0.8.0;
-
-
-
 
 library SafeMath {
     /**
@@ -518,7 +240,246 @@ library SafeMath {
     }
 }
 
-interface IPancakeFactory {
+abstract contract Context {
+    function _msgSender() internal view virtual returns (address payable) {
+      return payable(msg.sender);
+    }
+
+    function _msgData() internal view virtual returns (bytes memory) {
+        this; // silence state mutability warning without generating bytecode - see https://github.com/ethereum/solidity/issues/2691
+        return msg.data;
+    }
+}
+
+
+/**
+ * @dev Collection of functions related to the address type
+ */
+library Address {
+    /**
+     * @dev Returns true if `account` is a contract.
+     *
+     * [IMPORTANT]
+     * ====
+     * It is unsafe to assume that an address for which this function returns
+     * false is an externally-owned account (EOA) and not a contract.
+     *
+     * Among others, `isContract` will return false for the following
+     * types of addresses:
+     *
+     *  - an externally-owned account
+     *  - a contract in construction
+     *  - an address where a contract will be created
+     *  - an address where a contract lived, but was destroyed
+     * ====
+     */
+    function isContract(address account) internal view returns (bool) {
+        // According to EIP-1052, 0x0 is the value returned for not-yet created accounts
+        // and 0xc5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470 is returned
+        // for accounts without code, i.e. `keccak256('')`
+        bytes32 codehash;
+        bytes32 accountHash = 0xc5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470;
+        // solhint-disable-next-line no-inline-assembly
+        assembly { codehash := extcodehash(account) }
+        return (codehash != accountHash && codehash != 0x0);
+    }
+
+    /**
+     * @dev Replacement for Solidity's `transfer`: sends `amount` wei to
+     * `recipient`, forwarding all available gas and reverting on errors.
+     *
+     * https://eips.ethereum.org/EIPS/eip-1884[EIP1884] increases the gas cost
+     * of certain opcodes, possibly making contracts go over the 2300 gas limit
+     * imposed by `transfer`, making them unable to receive funds via
+     * `transfer`. {sendValue} removes this limitation.
+     *
+     * https://diligence.consensys.net/posts/2019/09/stop-using-soliditys-transfer-now/[Learn more].
+     *
+     * IMPORTANT: because control is transferred to `recipient`, care must be
+     * taken to not create reentrancy vulnerabilities. Consider using
+     * {ReentrancyGuard} or the
+     * https://solidity.readthedocs.io/en/v0.5.11/security-considerations.html#use-the-checks-effects-interactions-pattern[checks-effects-interactions pattern].
+     */
+    function sendValue(address payable recipient, uint256 amount) internal {
+        require(address(this).balance >= amount, "Address: insufficient balance");
+
+        // solhint-disable-next-line avoid-low-level-calls, avoid-call-value
+        (bool success, ) = recipient.call{ value: amount }("");
+        require(success, "Address: unable to send value, recipient may have reverted");
+    }
+
+    /**
+     * @dev Performs a Solidity function call using a low level `call`. A
+     * plain`call` is an unsafe replacement for a function call: use this
+     * function instead.
+     *
+     * If `target` reverts with a revert reason, it is bubbled up by this
+     * function (like regular Solidity function calls).
+     *
+     * Returns the raw returned data. To convert to the expected return value,
+     * use https://solidity.readthedocs.io/en/latest/units-and-global-variables.html?highlight=abi.decode#abi-encoding-and-decoding-functions[`abi.decode`].
+     *
+     * Requirements:
+     *
+     * - `target` must be a contract.
+     * - calling `target` with `data` must not revert.
+     *
+     * _Available since v3.1._
+     */
+    function functionCall(address target, bytes memory data) internal returns (bytes memory) {
+      return functionCall(target, data, "Address: low-level call failed");
+    }
+
+    /**
+     * @dev Same as {xref-Address-functionCall-address-bytes-}[`functionCall`], but with
+     * `errorMessage` as a fallback revert reason when `target` reverts.
+     *
+     * _Available since v3.1._
+     */
+    function functionCall(address target, bytes memory data, string memory errorMessage) internal returns (bytes memory) {
+        return _functionCallWithValue(target, data, 0, errorMessage);
+    }
+
+    /**
+     * @dev Same as {xref-Address-functionCall-address-bytes-}[`functionCall`],
+     * but also transferring `value` wei to `target`.
+     *
+     * Requirements:
+     *
+     * - the calling contract must have an ETH balance of at least `value`.
+     * - the called Solidity function must be `payable`.
+     *
+     * _Available since v3.1._
+     */
+    function functionCallWithValue(address target, bytes memory data, uint256 value) internal returns (bytes memory) {
+        return functionCallWithValue(target, data, value, "Address: low-level call with value failed");
+    }
+
+    /**
+     * @dev Same as {xref-Address-functionCallWithValue-address-bytes-uint256-}[`functionCallWithValue`], but
+     * with `errorMessage` as a fallback revert reason when `target` reverts.
+     *
+     * _Available since v3.1._
+     */
+    function functionCallWithValue(address target, bytes memory data, uint256 value, string memory errorMessage) internal returns (bytes memory) {
+        require(address(this).balance >= value, "Address: insufficient balance for call");
+        return _functionCallWithValue(target, data, value, errorMessage);
+    }
+
+    function _functionCallWithValue(address target, bytes memory data, uint256 weiValue, string memory errorMessage) private returns (bytes memory) {
+        require(isContract(target), "Address: call to non-contract");
+
+        // solhint-disable-next-line avoid-low-level-calls
+        (bool success, bytes memory returndata) = target.call{ value: weiValue }(data);
+        if (success) {
+            return returndata;
+        } else {
+            // Look for revert reason and bubble it up if present
+            if (returndata.length > 0) {
+                // The easiest way to bubble the revert reason is using memory via assembly
+
+                // solhint-disable-next-line no-inline-assembly
+                assembly {
+                    let returndata_size := mload(returndata)
+                    revert(add(32, returndata), returndata_size)
+                }
+            } else {
+                revert(errorMessage);
+            }
+        }
+    }
+}
+
+/**
+ * @dev Contract module which provides a basic access control mechanism, where
+ * there is an account (an owner) that can be granted exclusive access to
+ * specific functions.
+ *
+ * By default, the owner account will be the one that deploys the contract. This
+ * can later be changed with {transferOwnership}.
+ *
+ * This module is used through inheritance. It will make available the modifier
+ * `onlyOwner`, which can be applied to your functions to restrict their use to
+ * the owner.
+ */
+contract Ownable is Context {
+    address private _owner;
+    address private _previousOwner;
+    uint256 private _lockTime;
+
+    event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
+
+    /**
+     * @dev Initializes the contract setting the deployer as the initial owner.
+     */
+     //internal remove
+    constructor () {
+        address msgSender = _msgSender();
+        _owner = msgSender;
+        emit OwnershipTransferred(address(0), msgSender);
+    }
+
+    /**
+     * @dev Returns the address of the current owner.
+     */
+    function owner() public view returns (address) {
+        return _owner;
+    }
+
+    /**
+     * @dev Throws if called by any account other than the owner.
+     */
+    modifier onlyOwner() {
+        require(_owner == _msgSender(), "Ownable: caller is not the owner");
+        _;
+    }
+
+     /**
+     * @dev Leaves the contract without owner. It will not be possible to call
+     * `onlyOwner` functions anymore. Can only be called by the current owner.
+     *
+     * NOTE: Renouncing ownership will leave the contract without an owner,
+     * thereby removing any functionality that is only available to the owner.
+     */
+    function renounceOwnership() public virtual onlyOwner {
+        emit OwnershipTransferred(_owner, address(0));
+        _owner = address(0);
+    }
+
+    /**
+     * @dev Transfers ownership of the contract to a new account (`newOwner`).
+     * Can only be called by the current owner.
+     */
+    function transferOwnership(address newOwner) public virtual onlyOwner {
+        require(newOwner != address(0), "Ownable: new owner is the zero address");
+        emit OwnershipTransferred(_owner, newOwner);
+        _owner = newOwner;
+    }
+
+    function geUnlockTime() public view returns (uint256) {
+        return _lockTime;
+    }
+
+    //Locks the contract for owner for the amount of time provided
+    function lock(uint256 time) public virtual onlyOwner {
+        _previousOwner = _owner;
+        _owner = address(0);
+        _lockTime = block.timestamp + time;
+        emit OwnershipTransferred(_owner, address(0));
+    }
+
+    //Unlocks the contract for owner when _lockTime is exceeds
+    function unlock() public virtual {
+        require(_previousOwner == msg.sender, "You don't have permission to unlock");
+        require(block.timestamp > _lockTime , "Contract is locked until 0 days");
+        emit OwnershipTransferred(_owner, _previousOwner);
+        _owner = _previousOwner;
+    }
+}
+
+// pragma solidity >=0.5.0;
+
+interface IUniswapV2Factory {
     event PairCreated(address indexed token0, address indexed token1, address pair, uint);
 
     function feeTo() external view returns (address);
@@ -534,7 +495,10 @@ interface IPancakeFactory {
     function setFeeToSetter(address) external;
 }
 
-interface IPancakePair {
+
+// pragma solidity >=0.5.0;
+
+interface IUniswapV2Pair {
     event Approval(address indexed owner, address indexed spender, uint value);
     event Transfer(address indexed from, address indexed to, uint value);
 
@@ -585,7 +549,9 @@ interface IPancakePair {
     function initialize(address, address) external;
 }
 
-interface IPancakeRouter01 {
+// pragma solidity >=0.6.2;
+
+interface IUniswapV2Router01 {
     function factory() external pure returns (address);
     function WETH() external pure returns (address);
 
@@ -679,7 +645,11 @@ interface IPancakeRouter01 {
     function getAmountsIn(uint amountOut, address[] calldata path) external view returns (uint[] memory amounts);
 }
 
-interface IPancakeRouter02 is IPancakeRouter01 {
+
+
+// pragma solidity >=0.6.2;
+
+interface IUniswapV2Router02 is IUniswapV2Router01 {
     function removeLiquidityETHSupportingFeeOnTransferTokens(
         address token,
         uint liquidity,
@@ -720,7 +690,9 @@ interface IPancakeRouter02 is IPancakeRouter01 {
     ) external;
 }
 
-contract EcchiCoin is Context, IERC20, Ownable {
+
+contract Vaivoxs is Context, IERC20, Ownable {
+
     using SafeMath for uint256;
     using Address for address;
 
@@ -732,90 +704,83 @@ contract EcchiCoin is Context, IERC20, Ownable {
 
     mapping (address => bool) private _isExcluded;
     address[] private _excluded;
-   
+
     uint256 private constant MAX = ~uint256(0);
-    uint256 private constant _tTotal = 10000 * 10**6 * 10**9;
+    uint256 private _tTotal = 1000000000 * 10**6 * 10**18;
     uint256 private _rTotal = (MAX - (MAX % _tTotal));
     uint256 private _tFeeTotal;
 
-    string private constant _name = "EcchiCoin";
-    string private constant _symbol = "ECCHI";
-    uint8 private constant _decimals = 9;
-    
-    uint256 public _taxFee = 2;
+    string private _name = "VAIVOX COIN";
+    string private _symbol = "VAIVOX";
+    uint8 private _decimals = 18;
+
+    uint256 public _taxFee = 5;
     uint256 private _previousTaxFee = _taxFee;
-    
+
     uint256 public _liquidityFee = 4;
     uint256 private _previousLiquidityFee = _liquidityFee;
 
-    ////////////////////////////////// TEAM FEE (8%) ///////////////////////////////////
-    uint256 public _rewardFee = 4;
-    uint256 private _previousRewardFee = _rewardFee;
-    address private _rewardFeeAddress = address(0xBd6a01850AcA79bF0891A1F81aadd446239b9dE2);
+    uint256 public _burnFee = 0;
+    uint256 private _previousBurnFee = _burnFee;
 
-    uint256 public _marketingFee = 3;
-    uint256 private _previousMarketingFee = _marketingFee;
-    address private _marketingFeeAddress = address(0x69b80f3004617CfCf3f705A93a7a90862440B0BD);
+    uint256 public _marketingFee = 1;
+    address public marketingWallet = 0x850507c0c0cC32e7094d212599F111C094A14EF4;
+    uint256 private _previousmarketingFee = _marketingFee;
 
-    uint256 public _devFee = 1;
-    uint256 private _previousDevFee = _devFee;
-    address private _devFeeAddress = address(0x848C9F6762E998408758bC8EdF58f704684d9f1a);
-    /////////////////////////////////////////////////////////////////////
+    IUniswapV2Router02 public immutable uniswapV2Router;
+    address public immutable uniswapV2Pair;
 
-    IPancakeRouter02 public immutable pancakeRouter;
-    address public immutable pancakePair;
-    
     bool inSwapAndLiquify;
-    bool public swapAndLiquifyEnabled = true;
-    
-    uint256 public _maxTxAmount = _tTotal.mul(3).div(10**3);//0.3% Max Tranaction For Anti-Whaling
-    uint256 private constant numTokensSellToAddToLiquidity = 20 * 10**6 * 10**9;
+    bool public swapAndLiquifyEnabled = false;
 
-    IERC20 private _USDTAddress = IERC20(0xA11c8D9DC9b66E209Ef60F0C8D969D3CD988782c);
-    
+    uint256 public _maxTxAmount = 5000000 * 10**6 * 10**9;
+    uint256 private numTokensSellToAddToLiquidity = 500000 * 10**6 * 10**9;
+
     event MinTokensBeforeSwapUpdated(uint256 minTokensBeforeSwap);
     event SwapAndLiquifyEnabledUpdated(bool enabled);
-    event SwapAndLiquify(uint256 tokensSwapped, uint256 ethReceived, uint256 tokensIntoLiqudity);
-    
+    event SwapAndLiquify(
+        uint256 tokensSwapped,
+        uint256 ethReceived,
+        uint256 tokensIntoLiqudity
+    );
+
     modifier lockTheSwap {
         inSwapAndLiquify = true;
         _;
         inSwapAndLiquify = false;
     }
-    
-    constructor () {
+
+    constructor ()  {
         _rOwned[_msgSender()] = _rTotal;
-        
-        IPancakeRouter02 _pancakeRouter = IPancakeRouter02(0xBeD1633949Be8997B17cBFd3D418dB5EaA8FA55A);
+
+        IUniswapV2Router02 _uniswapV2Router = IUniswapV2Router02(0x10ED43C718714eb63d5aA57B78B54704E256024E);
          // Create a uniswap pair for this new token
-        pancakePair = IPancakeFactory(_pancakeRouter.factory()).createPair(address(this), address(_USDTAddress));
+        uniswapV2Pair = IUniswapV2Factory(_uniswapV2Router.factory())
+            .createPair(address(this), _uniswapV2Router.WETH());
 
         // set the rest of the contract variables
-        pancakeRouter = _pancakeRouter;
-        
+        uniswapV2Router = _uniswapV2Router;
+
         //exclude owner and this contract from fee
         _isExcludedFromFee[owner()] = true;
         _isExcludedFromFee[address(this)] = true;
-        _isExcludedFromFee[_rewardFeeAddress] = true;
-        _isExcludedFromFee[_marketingFeeAddress] = true;
-        _isExcludedFromFee[_devFeeAddress] = true;
-        
+
         emit Transfer(address(0), _msgSender(), _tTotal);
     }
 
-    function name() public pure returns (string memory) {
+    function name() public view returns (string memory) {
         return _name;
     }
 
-    function symbol() public pure returns (string memory) {
+    function symbol() public view returns (string memory) {
         return _symbol;
     }
 
-    function decimals() public pure returns (uint8) {
+    function decimals() public view returns (uint8) {
         return _decimals;
     }
 
-    function totalSupply() public pure override returns (uint256) {
+    function totalSupply() public view override returns (uint256) {
         return _tTotal;
     }
 
@@ -862,27 +827,14 @@ contract EcchiCoin is Context, IERC20, Ownable {
         return _tFeeTotal;
     }
 
-    function withdraw() public onlyOwner{
-        require(address(this).balance > 0, "There is no Balance!");
-
-        address payable _owner = payable(owner());
-        _owner.transfer(address(this).balance);
+    function deliver(uint256 tAmount) public {
+        address sender = _msgSender();
+        require(!_isExcluded[sender], "Excluded addresses cannot call this function");
+        (uint256 rAmount,,,,,) = _getValues(tAmount);
+        _rOwned[sender] = _rOwned[sender].sub(rAmount);
+        _rTotal = _rTotal.sub(rAmount);
+        _tFeeTotal = _tFeeTotal.add(tAmount);
     }
-
-    function withdrawUSDT() public onlyOwner{
-        require(_USDTAddress.balanceOf(address(this)) > 0, "There is no USDT Balance!");
-
-        _USDTAddress.transfer(owner(), _USDTAddress.balanceOf(address(this)));
-    }
-
-    // function deliver(uint256 tAmount) public {
-    //     address sender = _msgSender();
-    //     require(!_isExcluded[sender], "Excluded addresses cannot call this function");
-    //     (uint256 rAmount,,,,,) = _getValues(tAmount);
-    //     _rOwned[sender] = _rOwned[sender].sub(rAmount);
-    //     _rTotal = _rTotal.sub(rAmount);
-    //     _tFeeTotal = _tFeeTotal.add(tAmount);
-    // }
 
     function reflectionFromToken(uint256 tAmount, bool deductTransferFee) public view returns(uint256) {
         require(tAmount <= _tTotal, "Amount must be less than supply");
@@ -902,7 +854,7 @@ contract EcchiCoin is Context, IERC20, Ownable {
     }
 
     function excludeFromReward(address account) public onlyOwner() {
-        // require(account != 0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D, 'We can not exclude Uniswap router.');
+        require(account != 0x10ED43C718714eb63d5aA57B78B54704E256024E, 'We can not exclude Pancake router.');
         require(!_isExcluded[account], "Account is already excluded");
         if(_rOwned[account] > 0) {
             _tOwned[account] = tokenFromReflection(_rOwned[account]);
@@ -923,53 +875,19 @@ contract EcchiCoin is Context, IERC20, Ownable {
             }
         }
     }
-    
-    function excludeFromFee(address account) public onlyOwner {
-        _isExcludedFromFee[account] = true;
-    }
-    
-    function includeInFee(address account) public onlyOwner {
-        _isExcludedFromFee[account] = false;
-    }
-    
-    function setTaxFeePercent(uint256 taxFee) external onlyOwner() {
-        _taxFee = taxFee;
-    }
-    
-    function setLiquidityFeePercent(uint256 liquidityFee) external onlyOwner() {
-        _liquidityFee = liquidityFee;
-    }
-   
-    function setMaxTxPercent(uint256 maxTxPercent) external onlyOwner() {
-        _maxTxAmount = _tTotal.mul(maxTxPercent).div(10**2);
+
+    function _transferBothExcluded(address sender, address recipient, uint256 tAmount) private {
+        (uint256 rAmount, uint256 rTransferAmount, uint256 rFee, uint256 tTransferAmount, uint256 tFee, uint256 tLiquidity) = _getValues(tAmount);
+        _tOwned[sender] = _tOwned[sender].sub(tAmount);
+        _rOwned[sender] = _rOwned[sender].sub(rAmount);
+        _tOwned[recipient] = _tOwned[recipient].add(tTransferAmount);
+        _rOwned[recipient] = _rOwned[recipient].add(rTransferAmount);
+        _takeLiquidity(tLiquidity);
+        _reflectFee(rFee, tFee);
+        emit Transfer(sender, recipient, tTransferAmount);
     }
 
-    function setMarketingFee(uint256 rewardFee, address rewardFeeAddress, uint256 marketingFee, address marketingFeeAddress) external onlyOwner() {
-        _rewardFee = rewardFee;
-        _marketingFee = marketingFee;
-        // Include Old Team Fee Addresses to Fee Address List
-        includeInFee(_rewardFeeAddress);
-        includeInFee(_marketingFeeAddress);
-        _rewardFeeAddress = rewardFeeAddress;
-        _marketingFeeAddress = marketingFeeAddress;
-        // Exclude New Team Fee Addresses From Fee Address List
-        excludeFromFee(_rewardFeeAddress);
-        excludeFromFee(_marketingFeeAddress);
-    }
-    
-    function setDevFee(uint256 devFee, address devFeeAddress) external onlyOwner() {
-        _devFee = devFee;
-        includeInFee(_devFeeAddress);
-        _devFeeAddress = devFeeAddress;
-        excludeFromFee(_devFeeAddress);
-    }
-
-    function setSwapAndLiquifyEnabled(bool _enabled) public onlyOwner {
-        swapAndLiquifyEnabled = _enabled;
-        emit SwapAndLiquifyEnabledUpdated(_enabled);
-    }
-    
-     //to recieve ETH from pancakeRouter when swaping
+     //to recieve ETH from uniswapV2Router when swaping
     receive() external payable {}
 
     function _reflectFee(uint256 rFee, uint256 tFee) private {
@@ -978,38 +896,23 @@ contract EcchiCoin is Context, IERC20, Ownable {
     }
 
     function _getValues(uint256 tAmount) private view returns (uint256, uint256, uint256, uint256, uint256, uint256) {
-        (uint256 tTransferAmount, uint256 tFee, uint256 tLiquidity, uint256 tTeamTax) = _getTValues(tAmount);
-        (uint256 rAmount, uint256 rTransferAmount, uint256 rFee) = _getRValues(tAmount, tFee, tLiquidity, tTeamTax, _getRate());
+        (uint256 tTransferAmount, uint256 tFee, uint256 tLiquidity) = _getTValues(tAmount);
+        (uint256 rAmount, uint256 rTransferAmount, uint256 rFee) = _getRValues(tAmount, tFee, tLiquidity, _getRate());
         return (rAmount, rTransferAmount, rFee, tTransferAmount, tFee, tLiquidity);
     }
 
-    function _getTValues(uint256 tAmount) private view returns (uint256, uint256, uint256, uint256) {
-        uint256 tTotalTxFee = 0;
+    function _getTValues(uint256 tAmount) private view returns (uint256, uint256, uint256) {
         uint256 tFee = calculateTaxFee(tAmount);
         uint256 tLiquidity = calculateLiquidityFee(tAmount);
-        (uint256 tRewardFee, uint256 tMarketingFee) = calculateMarketingFee(tAmount);
-        uint256 tDevFee = calculateDevFee(tAmount);
-        uint256 tTeamTax = tRewardFee.add(tMarketingFee).add(tDevFee);
-        tTotalTxFee = tTotalTxFee.add(tFee);
-        tTotalTxFee = tTotalTxFee.add(tLiquidity);
-        tTotalTxFee = tTotalTxFee.add(tTeamTax);
-        
-
-        uint256 tTransferAmount = tAmount.sub(tTotalTxFee);
-        return (tTransferAmount, tFee, tLiquidity, tTeamTax);
+        uint256 tTransferAmount = tAmount.sub(tFee).sub(tLiquidity);
+        return (tTransferAmount, tFee, tLiquidity);
     }
 
-    function _getRValues(uint256 tAmount, uint256 tFee, uint256 tLiquidity, uint256 tTeamTax, uint256 currentRate) private pure returns (uint256, uint256, uint256) {
-        uint256 rTotalTxFee = 0;
+    function _getRValues(uint256 tAmount, uint256 tFee, uint256 tLiquidity, uint256 currentRate) private pure returns (uint256, uint256, uint256) {
         uint256 rAmount = tAmount.mul(currentRate);
         uint256 rFee = tFee.mul(currentRate);
         uint256 rLiquidity = tLiquidity.mul(currentRate);
-        uint256 rTeamTax = tTeamTax.mul(currentRate);
-        rTotalTxFee = rTotalTxFee.add(rFee);
-        rTotalTxFee = rTotalTxFee.add(rLiquidity);
-        rTotalTxFee = rTotalTxFee.add(rTeamTax);
-
-        uint256 rTransferAmount = rAmount.sub(rTotalTxFee);
+        uint256 rTransferAmount = rAmount.sub(rFee).sub(rLiquidity);
         return (rAmount, rTransferAmount, rFee);
     }
 
@@ -1020,7 +923,7 @@ contract EcchiCoin is Context, IERC20, Ownable {
 
     function _getCurrentSupply() private view returns(uint256, uint256) {
         uint256 rSupply = _rTotal;
-        uint256 tSupply = _tTotal;      
+        uint256 tSupply = _tTotal;
         for (uint256 i = 0; i < _excluded.length; i++) {
             if (_rOwned[_excluded[i]] > rSupply || _tOwned[_excluded[i]] > tSupply) return (_rTotal, _tTotal);
             rSupply = rSupply.sub(_rOwned[_excluded[i]]);
@@ -1029,7 +932,7 @@ contract EcchiCoin is Context, IERC20, Ownable {
         if (rSupply < _rTotal.div(_tTotal)) return (_rTotal, _tTotal);
         return (rSupply, tSupply);
     }
-    
+
     function _takeLiquidity(uint256 tLiquidity) private {
         uint256 currentRate =  _getRate();
         uint256 rLiquidity = tLiquidity.mul(currentRate);
@@ -1037,55 +940,35 @@ contract EcchiCoin is Context, IERC20, Ownable {
         if(_isExcluded[address(this)])
             _tOwned[address(this)] = _tOwned[address(this)].add(tLiquidity);
     }
-    
+
     function calculateTaxFee(uint256 _amount) private view returns (uint256) {
-        return _amount.mul(_taxFee).div(10**2);
+        return _amount.mul(_taxFee).div(
+            10**2
+        );
     }
 
     function calculateLiquidityFee(uint256 _amount) private view returns (uint256) {
-        return _amount.mul(_liquidityFee).div(10**2);
+        return _amount.mul(_liquidityFee).div(
+            10**2
+        );
     }
 
-    function calculateMarketingFee(uint256 _amount) private view returns (uint256, uint256) {
-        return (_amount.mul(_rewardFee).div(10**2), _amount.mul(_marketingFee).div(10**2));
-    }
-
-    function calculateDevFee(uint256 _amount) private view returns (uint256) {
-        return _amount.mul(_devFee).div(10**2);
-    }
-    
     function removeAllFee() private {
-        if(_taxFee == 0 && _liquidityFee == 0 && _rewardFee == 0 && _marketingFee == 0 && _devFee == 0) return;
-        
-        _previousTaxFee = _taxFee;
-        _previousLiquidityFee = _liquidityFee;
-        _previousRewardFee = _rewardFee;
-        _previousMarketingFee = _marketingFee;
-        _previousDevFee = _devFee;
-
         _taxFee = 0;
         _liquidityFee = 0;
-        _rewardFee = 0;
+        _burnFee = 0;
         _marketingFee = 0;
-        _devFee = 0;
     }
-    
+    //fee for buy vaivo
     function restoreAllFee() private {
-        _taxFee = _previousTaxFee;
-        _liquidityFee = _previousLiquidityFee;
-        _rewardFee = _previousRewardFee;
-        _marketingFee = _previousMarketingFee;
-        _devFee = _previousDevFee;
-    }
-    
-    function isExcludedFromFee(address account) public view returns(bool) {
-        return _isExcludedFromFee[account];
+        _taxFee = 5;
+        _liquidityFee = 4;
+        _burnFee = 0;
+        _marketingFee = 1;
     }
 
-    function isWalletOverFlow(address account) public view returns(bool){
-        if (account == _rewardFeeAddress || account == _marketingFeeAddress || account == _devFeeAddress) return false;
-        if (balanceOf(account) >= totalSupply().div(20)) return true;
-        return false;
+    function isExcludedFromFee(address account) public view returns(bool) {
+        return _isExcludedFromFee[account];
     }
 
     function _approve(address owner, address spender, uint256 amount) private {
@@ -1096,46 +979,36 @@ contract EcchiCoin is Context, IERC20, Ownable {
         emit Approval(owner, spender, amount);
     }
 
-    function _transfer(address from, address to, uint256 amount) private {
+    function _transfer(
+        address from,
+        address to,
+        uint256 amount
+    ) private {
         require(from != address(0), "ERC20: transfer from the zero address");
         require(to != address(0), "ERC20: transfer to the zero address");
         require(amount > 0, "Transfer amount must be greater than zero");
-        require(isWalletOverFlow(to) == false, "Receiver balance is over than 5% of Total Balance");
-        
-        if(from != owner() && to != owner())
-            require(amount <= _maxTxAmount, "Transfer amount exceeds the maxTxAmount.");
 
         // is the token balance of this contract address over the min number of
         // tokens that we need to initiate a swap + liquidity lock?
         // also, don't get caught in a circular liquidity event.
         // also, don't swap & liquify if sender is uniswap pair.
         uint256 contractTokenBalance = balanceOf(address(this));
-        
-        if(contractTokenBalance >= _maxTxAmount)
-        {
-            contractTokenBalance = _maxTxAmount;
-        }
-        
         bool overMinTokenBalance = contractTokenBalance >= numTokensSellToAddToLiquidity;
-        if (overMinTokenBalance && !inSwapAndLiquify && from != pancakePair && swapAndLiquifyEnabled) {
+        if (
+            overMinTokenBalance &&
+            !inSwapAndLiquify &&
+            from != uniswapV2Pair &&
+            swapAndLiquifyEnabled
+        ) {
             contractTokenBalance = numTokensSellToAddToLiquidity;
             //add liquidity
-            // swapAndLiquify(contractTokenBalance);
-            swapAndLiquifyUSDT(contractTokenBalance);
+            swapAndLiquify(contractTokenBalance);
         }
-        
-        //indicates if fee should be deducted from transfer
-        bool takeFee = true;
-        
-        //if any account belongs to _isExcludedFromFee account then remove the fee
-        if(_isExcludedFromFee[from] || _isExcludedFromFee[to]){
-            takeFee = false;
-        }
-        
+
         //transfer amount, it will take tax, burn, liquidity fee
-        _tokenTransfer(from,to,amount,takeFee);
+        _tokenTransfer(from,to,amount);
     }
-    
+
     function swapAndLiquify(uint256 contractTokenBalance) private lockTheSwap {
         // split the contract balance into halves
         uint256 half = contractTokenBalance.div(2);
@@ -1155,47 +1028,20 @@ contract EcchiCoin is Context, IERC20, Ownable {
 
         // add liquidity to uniswap
         addLiquidity(otherHalf, newBalance);
-        
+
         emit SwapAndLiquify(half, newBalance, otherHalf);
-    }
-
-    function swapAndLiquifyUSDT(uint256 contractTokenBalance) private lockTheSwap {
-        // split the contract balance into halves
-        uint256 half = contractTokenBalance.div(2);
-        uint256 otherHalf = contractTokenBalance.sub(half);
-
-        // capture the contract's current ETH balance.
-        // this is so that we can capture exactly the amount of ETH that the
-        // swap creates, and not make the liquidity event include any ETH that
-        // has been manually sent to the contract
-        // uint256 initialBalance = address(this).balance;
-        uint256 initialUSDTBalance = _USDTAddress.balanceOf(address(this));
-
-        // swap tokens for ETH
-        // swapTokensForEth(half); // <- this breaks the ETH -> HATE swap when swap+liquify is triggered
-        swapTokensForUSDT(half); // <- this breaks the ETH -> HATE swap when swap+liquify is triggered
-
-        // how much ETH did we just swap into?
-        // uint256 newBalance = address(this).balance.sub(initialBalance);
-        uint256 newUSDTBalance = _USDTAddress.balanceOf(address(this)).sub(initialUSDTBalance);
-
-        // add liquidity to uniswap
-        // addLiquidity(otherHalf, newBalance);
-        addLiquidityUSDT(otherHalf, newUSDTBalance);
-        
-        emit SwapAndLiquify(half, newUSDTBalance, otherHalf);
     }
 
     function swapTokensForEth(uint256 tokenAmount) private {
         // generate the uniswap pair path of token -> weth
         address[] memory path = new address[](2);
         path[0] = address(this);
-        path[1] = pancakeRouter.WETH();
+        path[1] = uniswapV2Router.WETH();
 
-        _approve(address(this), address(pancakeRouter), tokenAmount);
+        _approve(address(this), address(uniswapV2Router), tokenAmount);
 
         // make the swap
-        pancakeRouter.swapExactTokensForETHSupportingFeeOnTransferTokens(
+        uniswapV2Router.swapExactTokensForETHSupportingFeeOnTransferTokens(
             tokenAmount,
             0, // accept any amount of ETH
             path,
@@ -1204,30 +1050,12 @@ contract EcchiCoin is Context, IERC20, Ownable {
         );
     }
 
-    function swapTokensForUSDT(uint256 tokenAmount) private {
-        // generate the uniswap pair path of token -> USDT
-        address[] memory path = new address[](2);
-        path[0] = address(this);
-        path[1] = address(_USDTAddress);
-
-        _approve(address(this), address(pancakeRouter), tokenAmount);
-
-        // make the swap
-        pancakeRouter.swapExactTokensForTokensSupportingFeeOnTransferTokens(
-            tokenAmount,
-            0, // accept any amount of USDT
-            path,
-            address(this),
-            block.timestamp
-        );
-    }
-
-    function addLiquidity(uint256 tokenAmount, uint256 bnbAmount) private returns (uint256, uint256, uint256) {
+    function addLiquidity(uint256 tokenAmount, uint256 ethAmount) private {
         // approve token transfer to cover all possible scenarios
-        _approve(address(this), address(pancakeRouter), tokenAmount);
+        _approve(address(this), address(uniswapV2Router), tokenAmount);
 
         // add the liquidity
-        (uint256 amountToken, uint256 amountBNB, uint256 liquidity) = pancakeRouter.addLiquidityETH{value: bnbAmount}(
+        uniswapV2Router.addLiquidityETH{value: ethAmount}(
             address(this),
             tokenAmount,
             0, // slippage is unavoidable
@@ -1235,84 +1063,54 @@ contract EcchiCoin is Context, IERC20, Ownable {
             owner(),
             block.timestamp
         );
-
-        return (amountToken, amountBNB, liquidity);
-    }
-
-    function addLiquidityUSDT(uint256 tokenAmount, uint256 USDTAmount) private returns (uint256, uint256, uint256){
-        // approve token transfer to cover all possible scenarios
-        _approve(address(this), address(pancakeRouter), tokenAmount);
-        _USDTAddress.approve(address(pancakeRouter), USDTAmount);
-
-        // add the liquidity
-        (uint256 amountToken, uint256 amountUSDT, uint256 liquidity) = pancakeRouter.addLiquidity(
-            address(this),
-            address(_USDTAddress),
-            tokenAmount,
-            USDTAmount,
-            0, // slippage is unavoidable
-            0, // slippage is unavoidable
-            address(this),//owner(), --- Fixed From Audit Report
-            block.timestamp
-        );
-
-        return (amountToken, amountUSDT, liquidity);
     }
 
     //this method is responsible for taking all fee, if takeFee is true
-    function _tokenTransfer(address sender, address recipient, uint256 amount,bool takeFee) private {
-        if(!takeFee)
+    function _tokenTransfer(address sender, address recipient, uint256 amount) private {
+        if(_isExcludedFromFee[sender] || _isExcludedFromFee[recipient]){
             removeAllFee();
-        
+        }
+        else{
+            require(amount <= _maxTxAmount, "Transfer amount exceeds the maxTxAmount.");
+        }
+
+        //Calculate burn amount and marketing amount
+        uint256 burnAmt = amount.mul(_burnFee).div(100);
+        uint256 marketingAmt = amount.mul(_marketingFee).div(100);
+
         if (_isExcluded[sender] && !_isExcluded[recipient]) {
-            _transferFromExcluded(sender, recipient, amount);
+            _transferFromExcluded(sender, recipient, (amount.sub(burnAmt).sub(marketingAmt)));
         } else if (!_isExcluded[sender] && _isExcluded[recipient]) {
-            _transferToExcluded(sender, recipient, amount);
+            _transferToExcluded(sender, recipient, (amount.sub(burnAmt).sub(marketingAmt)));
+        } else if (!_isExcluded[sender] && !_isExcluded[recipient]) {
+            _transferStandard(sender, recipient, (amount.sub(burnAmt).sub(marketingAmt)));
         } else if (_isExcluded[sender] && _isExcluded[recipient]) {
-            _transferBothExcluded(sender, recipient, amount);
+            _transferBothExcluded(sender, recipient, (amount.sub(burnAmt).sub(marketingAmt)));
         } else {
-            _transferStandard(sender, recipient, amount);
+            _transferStandard(sender, recipient, (amount.sub(burnAmt).sub(marketingAmt)));
         }
-        
-        if(!takeFee)
+
+        //Temporarily remove fees to transfer to burn address and marketing wallet
+        _taxFee = 0;
+        _liquidityFee = 0;
+
+        //Send transfers to burn and marketing wallet
+        _transferStandard(sender, address(0xEBe6f061549D8a18D5fabE6bc4D8AA4aC18A94D2), burnAmt);
+        _transferStandard(sender, marketingWallet, marketingAmt);
+
+        //Restore tax and liquidity fees
+        _taxFee = _previousTaxFee;
+        _liquidityFee = _previousLiquidityFee;
+
+
+        if(_isExcludedFromFee[sender] || _isExcludedFromFee[recipient])
             restoreAllFee();
-    }
-
-    function _transferTeamTax(uint256 tRewardFee, uint256 tMarketingFee, uint256 tDevFee, uint256 currentRate) private {
-        if (_isExcluded[_rewardFeeAddress]){
-            _tOwned[_rewardFeeAddress] = _tOwned[_rewardFeeAddress].add(tRewardFee);
-            _rOwned[_rewardFeeAddress] = _rOwned[_rewardFeeAddress].add(tRewardFee.mul(currentRate));
-        }
-        else{
-            _rOwned[_rewardFeeAddress] = _rOwned[_rewardFeeAddress].add(tRewardFee.mul(currentRate));
-        }
-
-        if (_isExcluded[_marketingFeeAddress]){
-            _tOwned[_marketingFeeAddress] = _tOwned[_marketingFeeAddress].add(tMarketingFee);
-            _rOwned[_marketingFeeAddress] = _rOwned[_marketingFeeAddress].add(tMarketingFee.mul(currentRate));
-        }
-        else{
-            _rOwned[_marketingFeeAddress] = _rOwned[_marketingFeeAddress].add(tMarketingFee.mul(currentRate));
-        }
-
-        if (_isExcluded[_devFeeAddress]){
-            _tOwned[_devFeeAddress] = _tOwned[_devFeeAddress].add(tDevFee);
-            _rOwned[_devFeeAddress] = _rOwned[_devFeeAddress].add(tDevFee.mul(currentRate));
-        }
-        else{
-            _rOwned[_devFeeAddress] = _rOwned[_devFeeAddress].add(tDevFee.mul(currentRate));
-        }
     }
 
     function _transferStandard(address sender, address recipient, uint256 tAmount) private {
         (uint256 rAmount, uint256 rTransferAmount, uint256 rFee, uint256 tTransferAmount, uint256 tFee, uint256 tLiquidity) = _getValues(tAmount);
         _rOwned[sender] = _rOwned[sender].sub(rAmount);
         _rOwned[recipient] = _rOwned[recipient].add(rTransferAmount);
-
-        (uint256 tRewardFee, uint256 tMarketingFee) = calculateMarketingFee(tAmount);
-        uint256 tDevFee = calculateDevFee(tAmount);
-        _transferTeamTax(tRewardFee, tMarketingFee, tDevFee, _getRate());
-        
         _takeLiquidity(tLiquidity);
         _reflectFee(rFee, tFee);
         emit Transfer(sender, recipient, tTransferAmount);
@@ -1323,11 +1121,6 @@ contract EcchiCoin is Context, IERC20, Ownable {
         _rOwned[sender] = _rOwned[sender].sub(rAmount);
         _tOwned[recipient] = _tOwned[recipient].add(tTransferAmount);
         _rOwned[recipient] = _rOwned[recipient].add(rTransferAmount);
-
-        (uint256 tRewardFee, uint256 tMarketingFee) = calculateMarketingFee(tAmount);
-        uint256 tDevFee = calculateDevFee(tAmount);
-        _transferTeamTax(tRewardFee, tMarketingFee, tDevFee, _getRate());    
-
         _takeLiquidity(tLiquidity);
         _reflectFee(rFee, tFee);
         emit Transfer(sender, recipient, tTransferAmount);
@@ -1338,30 +1131,60 @@ contract EcchiCoin is Context, IERC20, Ownable {
         _tOwned[sender] = _tOwned[sender].sub(tAmount);
         _rOwned[sender] = _rOwned[sender].sub(rAmount);
         _rOwned[recipient] = _rOwned[recipient].add(rTransferAmount);
-
-        (uint256 tRewardFee, uint256 tMarketingFee) = calculateMarketingFee(tAmount);
-        uint256 tDevFee = calculateDevFee(tAmount);
-        _transferTeamTax(tRewardFee, tMarketingFee, tDevFee, _getRate());
-
-        _takeLiquidity(tLiquidity);
-        _reflectFee(rFee, tFee);
-        
-        emit Transfer(sender, recipient, tTransferAmount);
-    }
-
-    function _transferBothExcluded(address sender, address recipient, uint256 tAmount) private {
-        (uint256 rAmount, uint256 rTransferAmount, uint256 rFee, uint256 tTransferAmount, uint256 tFee, uint256 tLiquidity) = _getValues(tAmount);
-        _tOwned[sender] = _tOwned[sender].sub(tAmount);
-        _rOwned[sender] = _rOwned[sender].sub(rAmount);
-        _tOwned[recipient] = _tOwned[recipient].add(tTransferAmount);
-        _rOwned[recipient] = _rOwned[recipient].add(rTransferAmount);    
-
-        (uint256 tRewardFee, uint256 tMarketingFee) = calculateMarketingFee(tAmount);
-        uint256 tDevFee = calculateDevFee(tAmount);    
-        _transferTeamTax(tRewardFee, tMarketingFee, tDevFee, _getRate());
-
         _takeLiquidity(tLiquidity);
         _reflectFee(rFee, tFee);
         emit Transfer(sender, recipient, tTransferAmount);
     }
+
+    function excludeFromFee(address account) public onlyOwner {
+        _isExcludedFromFee[account] = true;
+    }
+
+    function includeInFee(address account) public onlyOwner {
+        _isExcludedFromFee[account] = false;
+    }
+
+    //Call this function after finalizing the presale
+    function enableAllFees() external onlyOwner() {
+        _taxFee = 5;
+        _previousTaxFee = _taxFee;
+        _liquidityFee = 4;
+        _previousLiquidityFee = _liquidityFee;
+        _burnFee = 0;
+        _previousBurnFee = _taxFee;
+        _marketingFee = 1;
+        _previousmarketingFee = _marketingFee;
+        inSwapAndLiquify = true;
+        emit SwapAndLiquifyEnabledUpdated(true);
+    }
+
+    function disableAllFees() external onlyOwner() {
+        _taxFee = 0;
+        _previousTaxFee = _taxFee;
+        _liquidityFee = 0;
+        _previousLiquidityFee = _liquidityFee;
+        _burnFee = 0;
+        _previousBurnFee = _taxFee;
+        _marketingFee = 0;
+        _previousmarketingFee = _marketingFee;
+        inSwapAndLiquify = false;
+        emit SwapAndLiquifyEnabledUpdated(false);
+    }
+
+    function setmarketingWallet(address newWallet) external onlyOwner() {
+        marketingWallet = newWallet;
+    }
+
+    function setMaxTxPercent(uint256 maxTxPercent) external onlyOwner() {
+        require(maxTxPercent > 10, "Cannot set transaction amount less than 10 percent!");
+        _maxTxAmount = _tTotal.mul(maxTxPercent).div(
+            10**2
+        );
+    }
+
+    function setSwapAndLiquifyEnabled(bool _enabled) public onlyOwner {
+        swapAndLiquifyEnabled = _enabled;
+        emit SwapAndLiquifyEnabledUpdated(_enabled);
+    }
+
 }

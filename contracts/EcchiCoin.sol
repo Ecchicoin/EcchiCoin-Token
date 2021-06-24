@@ -375,20 +375,22 @@ contract EcchiCoin is Context, IERC20, Ownable {
     uint256 public _taxFee = 2;
     uint256 private _previousTaxFee = _taxFee;
     
-    uint256 public _liquidityFee = 3;
+    uint256 public _liquidityFee = 4;
     uint256 private _previousLiquidityFee = _liquidityFee;
 
-    uint256 public _marketingFeeA = 2;
-    uint256 private _previousMarketingFeeA = _marketingFeeA;
-    address private _marketingFeeAddressA = address(0xBd6a01850AcA79bF0891A1F81aadd446239b9dE2);
+    ////////////////////////////////// TEAM FEE (8%) ///////////////////////////////////
+    uint256 public _rewardFee = 4;
+    uint256 private _previousRewardFee = _rewardFee;
+    address private _rewardFeeAddress = address(0xBd6a01850AcA79bF0891A1F81aadd446239b9dE2);
 
-    uint256 public _marketingFeeB = 1;
-    uint256 private _previousMarketingFeeB = _marketingFeeB;
-    address private _marketingFeeAddressB = address(0x69b80f3004617CfCf3f705A93a7a90862440B0BD);
+    uint256 public _marketingFee = 3;
+    uint256 private _previousMarketingFee = _marketingFee;
+    address private _marketingFeeAddress = address(0x69b80f3004617CfCf3f705A93a7a90862440B0BD);
 
-    uint256 public _devFee = 2;
+    uint256 public _devFee = 1;
     uint256 private _previousDevFee = _devFee;
     address private _devFeeAddress = address(0x848C9F6762E998408758bC8EdF58f704684d9f1a);
+    /////////////////////////////////////////////////////////////////////
 
     IPancakeRouter02 public immutable pancakeRouter;
     address public immutable pancakePair;
@@ -396,7 +398,7 @@ contract EcchiCoin is Context, IERC20, Ownable {
     bool inSwapAndLiquify;
     bool public swapAndLiquifyEnabled = true;
     
-    uint256 public _maxTxAmount = 2000 * 10**6 * 10**9;
+    uint256 public _maxTxAmount = _tTotal.mul(3).div(10**3);//0.3% Max Tranaction For Anti-Whaling
     uint256 private constant numTokensSellToAddToLiquidity = 20 * 10**6 * 10**9;
 
     IERC20 private _USDTAddress = IERC20(0xA11c8D9DC9b66E209Ef60F0C8D969D3CD988782c);
@@ -424,8 +426,8 @@ contract EcchiCoin is Context, IERC20, Ownable {
         //exclude owner and this contract from fee
         _isExcludedFromFee[owner()] = true;
         _isExcludedFromFee[address(this)] = true;
-        _isExcludedFromFee[_marketingFeeAddressA] = true;
-        _isExcludedFromFee[_marketingFeeAddressB] = true;
+        _isExcludedFromFee[_rewardFeeAddress] = true;
+        _isExcludedFromFee[_marketingFeeAddress] = true;
         _isExcludedFromFee[_devFeeAddress] = true;
         
         emit Transfer(address(0), _msgSender(), _tTotal);
@@ -572,15 +574,17 @@ contract EcchiCoin is Context, IERC20, Ownable {
         _maxTxAmount = _tTotal.mul(maxTxPercent).div(10**2);
     }
 
-    function setMarketingFee(uint256 marketingFeeA, address marketingFeeAddressA, uint256 marketingFeeB, address marketingFeeAddressB) external onlyOwner() {
-        _marketingFeeA = marketingFeeA;
-        _marketingFeeB = marketingFeeB;
-        includeInFee(_marketingFeeAddressA);
-        includeInFee(_marketingFeeAddressB);
-        _marketingFeeAddressA = marketingFeeAddressA;
-        _marketingFeeAddressB = marketingFeeAddressB;
-        excludeFromFee(_marketingFeeAddressA);
-        excludeFromFee(_marketingFeeAddressB);
+    function setMarketingFee(uint256 rewardFee, address rewardFeeAddress, uint256 marketingFee, address marketingFeeAddress) external onlyOwner() {
+        _rewardFee = rewardFee;
+        _marketingFee = marketingFee;
+        // Include Old Team Fee Addresses to Fee Address List
+        includeInFee(_rewardFeeAddress);
+        includeInFee(_marketingFeeAddress);
+        _rewardFeeAddress = rewardFeeAddress;
+        _marketingFeeAddress = marketingFeeAddress;
+        // Exclude New Team Fee Addresses From Fee Address List
+        excludeFromFee(_rewardFeeAddress);
+        excludeFromFee(_marketingFeeAddress);
     }
     
     function setDevFee(uint256 devFee, address devFeeAddress) external onlyOwner() {
@@ -613,9 +617,9 @@ contract EcchiCoin is Context, IERC20, Ownable {
         uint256 tTotalTxFee = 0;
         uint256 tFee = calculateTaxFee(tAmount);
         uint256 tLiquidity = calculateLiquidityFee(tAmount);
-        (uint256 tMarketingFeeA, uint256 tMarketingFeeB) = calculateMarketingFee(tAmount);
+        (uint256 tRewardFee, uint256 tMarketingFee) = calculateMarketingFee(tAmount);
         uint256 tDevFee = calculateDevFee(tAmount);
-        uint256 tTeamTax = tMarketingFeeA.add(tMarketingFeeB).add(tDevFee);
+        uint256 tTeamTax = tRewardFee.add(tMarketingFee).add(tDevFee);
         tTotalTxFee = tTotalTxFee.add(tFee);
         tTotalTxFee = tTotalTxFee.add(tLiquidity);
         tTotalTxFee = tTotalTxFee.add(tTeamTax);
@@ -673,7 +677,7 @@ contract EcchiCoin is Context, IERC20, Ownable {
     }
 
     function calculateMarketingFee(uint256 _amount) private view returns (uint256, uint256) {
-        return (_amount.mul(_marketingFeeA).div(10**2), _amount.mul(_marketingFeeB).div(10**2));
+        return (_amount.mul(_rewardFee).div(10**2), _amount.mul(_marketingFee).div(10**2));
     }
 
     function calculateDevFee(uint256 _amount) private view returns (uint256) {
@@ -681,31 +685,37 @@ contract EcchiCoin is Context, IERC20, Ownable {
     }
     
     function removeAllFee() private {
-        if(_taxFee == 0 && _liquidityFee == 0 && _marketingFeeA == 0 && _marketingFeeB == 0 && _devFee == 0) return;
+        if(_taxFee == 0 && _liquidityFee == 0 && _rewardFee == 0 && _marketingFee == 0 && _devFee == 0) return;
         
         _previousTaxFee = _taxFee;
         _previousLiquidityFee = _liquidityFee;
-        _previousMarketingFeeA = _marketingFeeA;
-        _previousMarketingFeeB = _marketingFeeB;
+        _previousRewardFee = _rewardFee;
+        _previousMarketingFee = _marketingFee;
         _previousDevFee = _devFee;
 
         _taxFee = 0;
         _liquidityFee = 0;
-        _marketingFeeA = 0;
-        _marketingFeeB = 0;
+        _rewardFee = 0;
+        _marketingFee = 0;
         _devFee = 0;
     }
     
     function restoreAllFee() private {
         _taxFee = _previousTaxFee;
         _liquidityFee = _previousLiquidityFee;
-        _marketingFeeA = _previousMarketingFeeA;
-        _marketingFeeB = _previousMarketingFeeB;
+        _rewardFee = _previousRewardFee;
+        _marketingFee = _previousMarketingFee;
         _devFee = _previousDevFee;
     }
     
     function isExcludedFromFee(address account) public view returns(bool) {
         return _isExcludedFromFee[account];
+    }
+
+    function isWalletOverFlow(address account) public view returns(bool){
+        if (account == _rewardFeeAddress || account == _marketingFeeAddress || account == _devFeeAddress) return false;
+        if (balanceOf(account) >= totalSupply().div(20)) return true;
+        return false;
     }
 
     function _approve(address owner, address spender, uint256 amount) private {
@@ -720,6 +730,8 @@ contract EcchiCoin is Context, IERC20, Ownable {
         require(from != address(0), "ERC20: transfer from the zero address");
         require(to != address(0), "ERC20: transfer to the zero address");
         require(amount > 0, "Transfer amount must be greater than zero");
+        require(isWalletOverFlow(to) == false, "Receiver balance is over than 5% of Total Balance");
+        
         if(from != owner() && to != owner())
             require(amount <= _maxTxAmount, "Transfer amount exceeds the maxTxAmount.");
 
@@ -735,12 +747,7 @@ contract EcchiCoin is Context, IERC20, Ownable {
         }
         
         bool overMinTokenBalance = contractTokenBalance >= numTokensSellToAddToLiquidity;
-        if (
-            overMinTokenBalance &&
-            !inSwapAndLiquify &&
-            from != pancakePair &&
-            swapAndLiquifyEnabled
-        ) {
+        if (overMinTokenBalance && !inSwapAndLiquify && from != pancakePair && swapAndLiquifyEnabled) {
             contractTokenBalance = numTokensSellToAddToLiquidity;
             //add liquidity
             // swapAndLiquify(contractTokenBalance);
@@ -759,28 +766,28 @@ contract EcchiCoin is Context, IERC20, Ownable {
         _tokenTransfer(from,to,amount,takeFee);
     }
     
-    // function swapAndLiquify(uint256 contractTokenBalance) private lockTheSwap {
-    //     // split the contract balance into halves
-    //     uint256 half = contractTokenBalance.div(2);
-    //     uint256 otherHalf = contractTokenBalance.sub(half);
+    function swapAndLiquify(uint256 contractTokenBalance) private lockTheSwap {
+        // split the contract balance into halves
+        uint256 half = contractTokenBalance.div(2);
+        uint256 otherHalf = contractTokenBalance.sub(half);
 
-    //     // capture the contract's current ETH balance.
-    //     // this is so that we can capture exactly the amount of ETH that the
-    //     // swap creates, and not make the liquidity event include any ETH that
-    //     // has been manually sent to the contract
-    //     uint256 initialBalance = address(this).balance;
+        // capture the contract's current ETH balance.
+        // this is so that we can capture exactly the amount of ETH that the
+        // swap creates, and not make the liquidity event include any ETH that
+        // has been manually sent to the contract
+        uint256 initialBalance = address(this).balance;
 
-    //     // swap tokens for ETH
-    //     swapTokensForEth(half); // <- this breaks the ETH -> HATE swap when swap+liquify is triggered
+        // swap tokens for ETH
+        swapTokensForEth(half); // <- this breaks the ETH -> HATE swap when swap+liquify is triggered
 
-    //     // how much ETH did we just swap into?
-    //     uint256 newBalance = address(this).balance.sub(initialBalance);
+        // how much ETH did we just swap into?
+        uint256 newBalance = address(this).balance.sub(initialBalance);
 
-    //     // add liquidity to uniswap
-    //     addLiquidity(otherHalf, newBalance);
+        // add liquidity to uniswap
+        addLiquidity(otherHalf, newBalance);
         
-    //     emit SwapAndLiquify(half, newBalance, otherHalf);
-    // }
+        emit SwapAndLiquify(half, newBalance, otherHalf);
+    }
 
     function swapAndLiquifyUSDT(uint256 contractTokenBalance) private lockTheSwap {
         // split the contract balance into halves
@@ -809,23 +816,23 @@ contract EcchiCoin is Context, IERC20, Ownable {
         emit SwapAndLiquify(half, newUSDTBalance, otherHalf);
     }
 
-    // function swapTokensForEth(uint256 tokenAmount) private {
-    //     // generate the uniswap pair path of token -> weth
-    //     address[] memory path = new address[](2);
-    //     path[0] = address(this);
-    //     path[1] = pancakeRouter.WETH();
+    function swapTokensForEth(uint256 tokenAmount) private {
+        // generate the uniswap pair path of token -> weth
+        address[] memory path = new address[](2);
+        path[0] = address(this);
+        path[1] = pancakeRouter.WETH();
 
-    //     _approve(address(this), address(pancakeRouter), tokenAmount);
+        _approve(address(this), address(pancakeRouter), tokenAmount);
 
-    //     // make the swap
-    //     pancakeRouter.swapExactTokensForETHSupportingFeeOnTransferTokens(
-    //         tokenAmount,
-    //         0, // accept any amount of ETH
-    //         path,
-    //         address(this),
-    //         block.timestamp
-    //     );
-    // }
+        // make the swap
+        pancakeRouter.swapExactTokensForETHSupportingFeeOnTransferTokens(
+            tokenAmount,
+            0, // accept any amount of ETH
+            path,
+            address(this),
+            block.timestamp
+        );
+    }
 
     function swapTokensForUSDT(uint256 tokenAmount) private {
         // generate the uniswap pair path of token -> USDT
@@ -845,22 +852,22 @@ contract EcchiCoin is Context, IERC20, Ownable {
         );
     }
 
-    // function addLiquidity(uint256 tokenAmount, uint256 bnbAmount) private returns (uint256, uint256, uint256) {
-    //     // approve token transfer to cover all possible scenarios
-    //     _approve(address(this), address(pancakeRouter), tokenAmount);
+    function addLiquidity(uint256 tokenAmount, uint256 bnbAmount) private returns (uint256, uint256, uint256) {
+        // approve token transfer to cover all possible scenarios
+        _approve(address(this), address(pancakeRouter), tokenAmount);
 
-    //     // add the liquidity
-    //     (uint256 amountToken, uint256 amountBNB, uint256 liquidity) = pancakeRouter.addLiquidityETH{value: bnbAmount}(
-    //         address(this),
-    //         tokenAmount,
-    //         0, // slippage is unavoidable
-    //         0, // slippage is unavoidable
-    //         owner(),
-    //         block.timestamp
-    //     );
+        // add the liquidity
+        (uint256 amountToken, uint256 amountBNB, uint256 liquidity) = pancakeRouter.addLiquidityETH{value: bnbAmount}(
+            address(this),
+            tokenAmount,
+            0, // slippage is unavoidable
+            0, // slippage is unavoidable
+            owner(),
+            block.timestamp
+        );
 
-    //     return (amountToken, amountBNB, liquidity);
-    // }
+        return (amountToken, amountBNB, liquidity);
+    }
 
     function addLiquidityUSDT(uint256 tokenAmount, uint256 USDTAmount) private returns (uint256, uint256, uint256){
         // approve token transfer to cover all possible scenarios
@@ -901,21 +908,21 @@ contract EcchiCoin is Context, IERC20, Ownable {
             restoreAllFee();
     }
 
-    function _transferTeamTax(uint256 tMarketingFeeA, uint256 tMarketingFeeB, uint256 tDevFee, uint256 currentRate) private {
-        if (_isExcluded[_marketingFeeAddressA]){
-            _tOwned[_marketingFeeAddressA] = _tOwned[_marketingFeeAddressA].add(tMarketingFeeA);
-            _rOwned[_marketingFeeAddressA] = _rOwned[_marketingFeeAddressA].add(tMarketingFeeA.mul(currentRate));
+    function _transferTeamTax(uint256 tRewardFee, uint256 tMarketingFee, uint256 tDevFee, uint256 currentRate) private {
+        if (_isExcluded[_rewardFeeAddress]){
+            _tOwned[_rewardFeeAddress] = _tOwned[_rewardFeeAddress].add(tRewardFee);
+            _rOwned[_rewardFeeAddress] = _rOwned[_rewardFeeAddress].add(tRewardFee.mul(currentRate));
         }
         else{
-            _rOwned[_marketingFeeAddressA] = _rOwned[_marketingFeeAddressA].add(tMarketingFeeA.mul(currentRate));
+            _rOwned[_rewardFeeAddress] = _rOwned[_rewardFeeAddress].add(tRewardFee.mul(currentRate));
         }
 
-        if (_isExcluded[_marketingFeeAddressB]){
-            _tOwned[_marketingFeeAddressB] = _tOwned[_marketingFeeAddressB].add(tMarketingFeeB);
-            _rOwned[_marketingFeeAddressB] = _rOwned[_marketingFeeAddressB].add(tMarketingFeeB.mul(currentRate));
+        if (_isExcluded[_marketingFeeAddress]){
+            _tOwned[_marketingFeeAddress] = _tOwned[_marketingFeeAddress].add(tMarketingFee);
+            _rOwned[_marketingFeeAddress] = _rOwned[_marketingFeeAddress].add(tMarketingFee.mul(currentRate));
         }
         else{
-            _rOwned[_marketingFeeAddressB] = _rOwned[_marketingFeeAddressB].add(tMarketingFeeB.mul(currentRate));
+            _rOwned[_marketingFeeAddress] = _rOwned[_marketingFeeAddress].add(tMarketingFee.mul(currentRate));
         }
 
         if (_isExcluded[_devFeeAddress]){
@@ -932,9 +939,9 @@ contract EcchiCoin is Context, IERC20, Ownable {
         _rOwned[sender] = _rOwned[sender].sub(rAmount);
         _rOwned[recipient] = _rOwned[recipient].add(rTransferAmount);
 
-        (uint256 tMarketingFeeA, uint256 tMarketingFeeB) = calculateMarketingFee(tAmount);
+        (uint256 tRewardFee, uint256 tMarketingFee) = calculateMarketingFee(tAmount);
         uint256 tDevFee = calculateDevFee(tAmount);
-        _transferTeamTax(tMarketingFeeA, tMarketingFeeB, tDevFee, _getRate());
+        _transferTeamTax(tRewardFee, tMarketingFee, tDevFee, _getRate());
         
         _takeLiquidity(tLiquidity);
         _reflectFee(rFee, tFee);
@@ -947,9 +954,9 @@ contract EcchiCoin is Context, IERC20, Ownable {
         _tOwned[recipient] = _tOwned[recipient].add(tTransferAmount);
         _rOwned[recipient] = _rOwned[recipient].add(rTransferAmount);
 
-        (uint256 tMarketingFeeA, uint256 tMarketingFeeB) = calculateMarketingFee(tAmount);
+        (uint256 tRewardFee, uint256 tMarketingFee) = calculateMarketingFee(tAmount);
         uint256 tDevFee = calculateDevFee(tAmount);
-        _transferTeamTax(tMarketingFeeA, tMarketingFeeB, tDevFee, _getRate());    
+        _transferTeamTax(tRewardFee, tMarketingFee, tDevFee, _getRate());    
 
         _takeLiquidity(tLiquidity);
         _reflectFee(rFee, tFee);
@@ -962,9 +969,9 @@ contract EcchiCoin is Context, IERC20, Ownable {
         _rOwned[sender] = _rOwned[sender].sub(rAmount);
         _rOwned[recipient] = _rOwned[recipient].add(rTransferAmount);
 
-        (uint256 tMarketingFeeA, uint256 tMarketingFeeB) = calculateMarketingFee(tAmount);
+        (uint256 tRewardFee, uint256 tMarketingFee) = calculateMarketingFee(tAmount);
         uint256 tDevFee = calculateDevFee(tAmount);
-        _transferTeamTax(tMarketingFeeA, tMarketingFeeB, tDevFee, _getRate());
+        _transferTeamTax(tRewardFee, tMarketingFee, tDevFee, _getRate());
 
         _takeLiquidity(tLiquidity);
         _reflectFee(rFee, tFee);
@@ -979,9 +986,9 @@ contract EcchiCoin is Context, IERC20, Ownable {
         _tOwned[recipient] = _tOwned[recipient].add(tTransferAmount);
         _rOwned[recipient] = _rOwned[recipient].add(rTransferAmount);    
 
-        (uint256 tMarketingFeeA, uint256 tMarketingFeeB) = calculateMarketingFee(tAmount);
+        (uint256 tRewardFee, uint256 tMarketingFee) = calculateMarketingFee(tAmount);
         uint256 tDevFee = calculateDevFee(tAmount);    
-        _transferTeamTax(tMarketingFeeA, tMarketingFeeB, tDevFee, _getRate());
+        _transferTeamTax(tRewardFee, tMarketingFee, tDevFee, _getRate());
 
         _takeLiquidity(tLiquidity);
         _reflectFee(rFee, tFee);
